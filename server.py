@@ -3,6 +3,12 @@ import os
 
 app = Flask(__name__)
 
+@app.route('/')
+def index():
+    return 'Hello from Flask!'
+
+
+
 UPLOAD_FOLDER = './uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Crea la carpeta si no existe
 
