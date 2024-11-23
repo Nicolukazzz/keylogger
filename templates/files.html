@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivos Subidos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">Keylogger</div>
+        <nav>
+            <a href="/">Inicio</a>
+            <a href="/files">Archivos Subidos</a>
+            <a href="#contacto">Contacto</a>
+        </nav>
+    </header>
+    <section class="content">
+        <h1>Archivos Subidos</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <label for="file-upload" class="custom-file-upload">Seleccionar Archivo</label>
+            <input id="file-upload" type="file" name="file" required>
+            <button type="submit" class="btn">Subir Archivo</button>
+        </form>
+        <ul>
+            {% if files %}
+                {% for file in files %}
+                    <li><a href="{{ url_for('get_file', filename=file) }}">{{ file }}</a></li>
+                {% endfor %}
+            {% else %}
+                <li>No hay archivos subidos.</li>
+            {% endif %}
+        </ul>
+    </section>
+    <footer id="contacto">
+        <p>Creado por Nicolukaz © 2024</p>
+    </footer>
+</body>
+</html>
