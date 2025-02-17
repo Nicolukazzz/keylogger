@@ -17,11 +17,6 @@
     </header>
     <section class="content">
         <h1>Archivos Subidos</h1>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <label for="file-upload" class="custom-file-upload">Seleccionar Archivo</label>
-            <input id="file-upload" type="file" name="file" required>
-            <button type="submit" class="btn">Subir Archivo</button>
-        </form>
         <ul>
             {% if files_by_pc %}
                 {% for pc, files in files_by_pc.items() %}
