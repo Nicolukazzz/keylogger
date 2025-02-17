@@ -1,4 +1,4 @@
-from flask import Flask, request, send_from_directory, render_template
+from flask import Flask, request, send_from_directory, render_template, send_file
 import os
 
 app = Flask(__name__)
@@ -37,6 +37,14 @@ def upload_file():
 
     return "File uploaded successfully", 200
 
+@app.route('/files/<pc>/<filename>', methods=['GET'])
+def get_file(pc, filename):
+    try:
+        # Descargar el archivo desde la carpeta del PC correspondiente
+        return send_from_directory(os.path.join(UPLOAD_FOLDER, pc), filename)
+    except FileNotFoundError:
+        return "File not found", 404
+
 @app.route('/files')
 def list_files():
     # Listar todas las carpetas de PC y sus archivos
@@ -47,14 +55,6 @@ def list_files():
         if os.path.isdir(pc_folder):
             files_by_pc[pc] = os.listdir(pc_folder)
     return render_template('files.html', files_by_pc=files_by_pc)
-
-@app.route('/files/<pc>/<filename>', methods=['GET'])
-def get_file(pc, filename):
-    try:
-        # Descargar el archivo desde la carpeta del PC correspondiente
-        return send_from_directory(os.path.join(UPLOAD_FOLDER, pc), filename)
-    except FileNotFoundError:
-        return "File not found", 404
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))

