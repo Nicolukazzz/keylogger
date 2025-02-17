@@ -24,34 +24,35 @@ def upload_file():
     if file.filename == '':
         return "No selected file", 400
 
-    original_filename = file.filename
-    file_path = os.path.join(UPLOAD_FOLDER, original_filename)
+    # Extraer el nombre del PC del nombre del archivo
+    hostname = file.filename.split('_')[0]
+    
+    # Crear una carpeta para el PC si no existe
+    hostname_folder = os.path.join(UPLOAD_FOLDER, hostname)
+    os.makedirs(hostname_folder, exist_ok=True)
 
-    if os.path.exists(file_path):
-        base, extension = os.path.splitext(original_filename)
-        counter = 1
-        new_filename = f"{base}_{counter}{extension}"
-        new_file_path = os.path.join(UPLOAD_FOLDER, new_filename)
-
-        while os.path.exists(new_file_path):
-            counter += 1
-            new_filename = f"{base}_{counter}{extension}"
-            new_file_path = os.path.join(UPLOAD_FOLDER, new_filename)
-
-        file_path = new_file_path
-
+    # Guardar el archivo en la carpeta correspondiente (se sobrescribe si ya existe)
+    file_path = os.path.join(hostname_folder, file.filename)
     file.save(file_path)
+
     return "File uploaded successfully", 200
 
 @app.route('/files')
 def list_files():
-    files = os.listdir(UPLOAD_FOLDER)
-    return render_template('files.html', files=files)
+    # Listar todas las carpetas de PC y sus archivos
+    pcs = os.listdir(UPLOAD_FOLDER)
+    files_by_pc = {}
+    for pc in pcs:
+        pc_folder = os.path.join(UPLOAD_FOLDER, pc)
+        if os.path.isdir(pc_folder):
+            files_by_pc[pc] = os.listdir(pc_folder)
+    return render_template('files.html', files_by_pc=files_by_pc)
 
-@app.route('/files/<filename>', methods=['GET'])
-def get_file(filename):
+@app.route('/files/<pc>/<filename>', methods=['GET'])
+def get_file(pc, filename):
     try:
-        return send_from_directory(UPLOAD_FOLDER, filename)
+        # Descargar el archivo desde la carpeta del PC correspondiente
+        return send_from_directory(os.path.join(UPLOAD_FOLDER, pc), filename)
     except FileNotFoundError:
         return "File not found", 404
     

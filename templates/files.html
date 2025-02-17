@@ -24,9 +24,16 @@
             <button type="submit" class="btn">Subir Archivo</button>
         </form>
         <ul>
-            {% if files %}
-                {% for file in files %}
-                    <li><a href="{{ url_for('get_file', filename=file) }}">{{ file }}</a></li>
+            {% if files_by_pc %}
+                {% for pc, files in files_by_pc.items() %}
+                    <li>
+                        <strong>{{ pc }}</strong>
+                        <ul>
+                            {% for file in files %}
+                                <li><a href="{{ url_for('get_file', pc=pc, filename=file) }}">{{ file }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
                 {% endfor %}
             {% else %}
                 <li>No hay archivos subidos.</li>
